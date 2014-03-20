@@ -430,6 +430,16 @@ typedef enum {
 -(void) addFile:(NSString*) filePath forKey:(NSString*) key mimeType:(NSString*) mimeType;
 
 /*!
+ *  @abstract Attaches a file to the request and allows you to specify a mime-type
+ *  
+ *  @discussion
+ *	This method lets you attach a file to the request with overriden of filename
+ *  The method has a side effect. It changes the HTTPMethod to "POST" regardless of what it was before.
+ *  It also changes the post format to multipart/form-data
+ */
+-(void) addFile:(NSString*) filePath fileName:(NSString*)fileName forKey:(NSString*) key;
+
+/*!
  *  @abstract Attaches a resource to the request from a NSData pointer
  *  
  *  @discussion

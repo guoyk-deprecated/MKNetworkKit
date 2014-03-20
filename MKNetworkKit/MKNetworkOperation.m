@@ -787,22 +787,40 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
   [self.dataToBePosted addObject:dict];
 }
 
--(void) addFile:(NSString*) filePath forKey:(NSString*) key {
-  
-  [self addFile:filePath forKey:key mimeType:@"application/octet-stream"];
+-(void) addFile:(NSString*) filePath fileName:(NSString*)fileName forKey:(NSString*) key
+{
+  [self addFile:filePath forKey:key mimeType:nil fileName:fileName];
 }
 
--(void) addFile:(NSString*) filePath forKey:(NSString*) key mimeType:(NSString*) mimeType {
-  
+-(void) addFile:(NSString*) filePath forKey:(NSString*) key
+{
+  [self addFile:filePath forKey:key mimeType:nil fileName:nil];
+}
+
+-(void) addFile:(NSString *)filePath forKey:(NSString *)key mimeType:(NSString *)mimeType fileName:(NSString*)fileName
+{
   if ([self.request.HTTPMethod isEqualToString:@"GET"]) {
     [self.request setHTTPMethod:@"POST"];
   }
   
+  if (mimeType == nil) {
+    mimeType = @"application/octet-stream";
+  }
+  
+  if (fileName == nil) {
+    fileName = [filePath lastPathComponent];
+  }
+  
   NSDictionary *dict = @{@"filepath": filePath,
-  @"name": key,
-  @"mimetype": mimeType};
+                         @"name": key,
+                         @"filename":fileName,
+                         @"mimetype": mimeType};
   
   [self.filesToBePosted addObject:dict];
+}
+
+-(void) addFile:(NSString*) filePath forKey:(NSString*) key mimeType:(NSString*) mimeType {
+  [self addFile:filePath forKey:key mimeType:mimeType fileName:nil];
 }
 
 -(NSData*) bodyData {
@@ -833,7 +851,7 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
                                  @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
                                  boundary,
                                  thisFile[@"name"],
-                                 [thisFile[@"filepath"] lastPathComponent],
+                                 thisFile[@"filename"],
                                  thisFile[@"mimetype"]];
     
     [body appendData:[thisFieldString dataUsingEncoding:[self stringEncoding]]];
@@ -889,8 +907,6 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
 #pragma Main method
 -(void) main {
   
-  [self configurePostFieldsBeforeStart:self.fieldsToBePosted];
-  
   @autoreleasepool {
     [self start];
   }
@@ -910,6 +926,7 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
 
 - (void) start
 {
+  [self configurePostFieldsBeforeStart:self.fieldsToBePosted];
   
 #if TARGET_OS_IPHONE
   self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
