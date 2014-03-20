@@ -24,6 +24,7 @@
 //  THE SOFTWARE.
 
 #import "MKNetworkKit.h"
+#import "MKNetworkOperation+CWInternal.h"
 
 #ifdef __OBJC_GC__
 #error MKNetworkKit does not support Objective-C Garbage Collection
@@ -768,9 +769,17 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
   self.cacheHandlingBlock = cacheHandler;
 }
 
+#pragma mark - CWInternal
+
+- (void)configurePostFieldsBeforeStart:(NSMutableDictionary *)postFields
+{
+}
+
 #pragma mark -
 #pragma Main method
 -(void) main {
+  
+  [self configurePostFieldsBeforeStart:self.fieldsToBePosted];
   
   @autoreleasepool {
     [self start];
