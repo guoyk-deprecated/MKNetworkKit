@@ -32,7 +32,7 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[networkError localizedDescription]
                                                     message:[networkError localizedRecoverySuggestion]
                                                    delegate:nil
-                                          cancelButtonTitle:NSLocalizedString(@"Dismiss", @"")
+                                          cancelButtonTitle:NSLocalizedString(@"dismiss", @"")
                                           otherButtonTitles:nil];
     [alert show];
     return alert;
