@@ -770,13 +770,17 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
 
 -(void) addData:(NSData*) data forKey:(NSString*) key {
   
-  [self addData:data forKey:key mimeType:@"application/octet-stream" fileName:@"file"];
+  [self addData:data forKey:key mimeType:nil fileName:@"file"];
 }
 
 -(void) addData:(NSData*) data forKey:(NSString*) key mimeType:(NSString*) mimeType fileName:(NSString*) fileName {
   
   if ([self.request.HTTPMethod isEqualToString:@"GET"]) {
     [self.request setHTTPMethod:@"POST"];
+  }
+  
+  if (mimeType.length == 0) {
+    mimeType = @"application/octet-stream";
   }
   
   NSDictionary *dict = @{@"data": data,
